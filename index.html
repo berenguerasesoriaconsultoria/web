@@ -171,49 +171,49 @@
               <strong>WhatsApp:</strong> <a href="https://wa.me/34600000000">+34 600 000 000</a>
             </p>
           </div>
-          <form name="contacto" method="POST" data-netlify="true">
+          <form id="contactForm" name="contacto" method="POST" data-netlify="true" netlify-honeypot="website">
+  <input type="hidden" name="form-name" value="contacto" />
 
-            <input type="hidden" name="form-name" value="contacto">
+  <input type="text" name="nombre" placeholder="Nombre y apellidos" required />
+  <input type="email" name="email" placeholder="Correo electrónico" required />
+  <input type="text" name="empresa" placeholder="Autónomo o empresa" />
+  <textarea name="mensaje" placeholder="Cuéntame brevemente tu consulta" required></textarea>
 
-            <input type="text" name="nombre" placeholder="Nombre y apellidos" required />
-            <input type="email" name="email" placeholder="Correo electrónico" required />
-            <input type="text" name="empresa" placeholder="Autónomo o empresa" />
-            <textarea name="mensaje" placeholder="Cuéntame brevemente tu consulta" required></textarea>
+  <!-- honeypot anti-spam -->
+  <input type="text" name="website" autocomplete="off" tabindex="-1" style="display:none" />
 
-            <!-- honeypot -->
-            <input type="text" name="website" autocomplete="off" tabindex="-1" style="display:none" />
+  <button class="form-btn" type="submit">Enviar consulta</button>
+  <p id="formStatus" style="margin:10px 0 0;"></p>
+</form>
 
-            <button class="form-btn" type="submit">Enviar consulta</button>
-          </form>
+<script>
+  const form = document.getElementById("contactForm");
+  const statusEl = document.getElementById("formStatus");
 
-          <script>
-            const form = document.getElementById("contactForm");
-            const statusEl = document.getElementById("formStatus");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    statusEl.textContent = "Enviando…";
 
-            form.addEventListener("submit", async (e) => {
-              e.preventDefault();
-              statusEl.textContent = "Enviando…";
+    try {
+      const formData = new FormData(form);
+      // Netlify espera x-www-form-urlencoded para formularios AJAX
+      const body = new URLSearchParams(formData).toString();
 
-              try {
-                // Netlify Forms usa POST normal con application/x-www-form-urlencoded
-                const formData = new FormData(form);
-                const body = new URLSearchParams(formData).toString();
+      const res = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body
+      });
 
-                const res = await fetch("/", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                  body
-                });
+      if (!res.ok) throw new Error("Netlify Forms error");
 
-                if (!res.ok) throw new Error("Netlify Forms error");
-
-                statusEl.textContent = "¡Mensaje enviado! Te responderé en menos de 24h laborables.";
-                form.reset();
-              } catch (err) {
-                statusEl.textContent = "No se pudo enviar. Prueba de nuevo o escribe a asesoria.consultoria@ireneberenguer.com.";
-              }
-            });
-          </script>
+      statusEl.textContent = "¡Mensaje enviado! Te responderé en menos de 24h laborables.";
+      form.reset();
+    } catch (err) {
+      statusEl.textContent = "No se pudo enviar. Prueba de nuevo o escribe a asesoria.consultoria@ireneberenguer.com.";
+    }
+  });
+</script>
 
 
         </div>
